@@ -1,6 +1,6 @@
 {
   "name": "hapi-mongoose-handlers",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "REST handlers for models created in mongoose",
   "main": "lib/index.js",
   "scripts": {
