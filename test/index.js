@@ -57,7 +57,6 @@ var routes = [{
 var adminId;
 var userId;
 
-
 lab.before(function (done) {
 
     Mongoose.connect('mongodb://localhost/test-hapi-mongoose-handlers', function (err) {
@@ -96,22 +95,21 @@ lab.before(function (done) {
     });
 });
 
-
 // Connect with database and create fixture data
 
 lab.before(function (done) {
 
     Async.parallel([
         function (callback) {
-        
+
             Mongoose.model('User').remove({}, callback);
         },
         function (callback) {
-        
+
             Mongoose.model('Role').remove({}, callback);
         },
         function (callback) {
-        
+
             Mongoose.model('Admin').remove({}, callback);
         }
     ], function (err) {
@@ -122,7 +120,7 @@ lab.before(function (done) {
 
         Async.waterfall([
             function (callback) {
-            
+
                 Mongoose.model('Role').create({
                     name: 'admin',
                     permissions: ['update', 'create', 'remove']
@@ -158,7 +156,6 @@ lab.before(function (done) {
         });
     });
 });
-
 
 lab.experiment('Hapi-mongoose-handlers', function () {
 
@@ -504,7 +501,7 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                 });
             });
 
-            
+
             lab.test('`/admins/{id}34` (bad id), it returns Boom object with statusCode 500', function (done) {
 
                 var request = {
@@ -651,7 +648,7 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                     payload: {
                         admin: {
                             name: 'Luis',
-                            age: 32    
+                            age: 32
                         }
                     }
                 };
@@ -761,7 +758,7 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                     }
                 };
                 server.inject(request, function (response) {
-                    
+
                     Code.expect(response.statusCode).to.be.equal(200);
                     return done();
                 });

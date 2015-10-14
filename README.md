@@ -29,7 +29,7 @@ server.register([{
             }
         }
     }, {
-        register: require('hapi-mongoose-request'),
+        register: require('hapi-mongoose-request'), // REQUIRED
         options: {
             param: 'model',
             capitalize: true,
@@ -39,9 +39,8 @@ server.register([{
         register: require('hapi-mongoose-handlers'),
         options: {
             find: function (route, options) {},     // Custom handler
-            pagination: {                               // Can personalize all response information
-                meta: 'meta',
-                totalPages: 'count'                 
+            meta: {                               // Can personalize the meta information
+                totalPagesKey: 'count'
             },
             onCreate: 'object',                     // Determine what information will return
             onRemove: 'no-content',
@@ -52,15 +51,15 @@ server.register([{
         if (err) {
             throw err;
         }
-        
+
         server.route({
             method: 'GET',
-            path: '/api/{model}/{id?}'       // hapi-mongoose-request Plugin is almost necessary
+            path: '/api/{model}/{id?}'       // hapi-mongoose-request Plugin is necessary
             handler: {
                 find: {}
             }
         });
-        
+
         // Now can visit `/{yourmodel}/{id?}
 
         server.start(function (err) {
