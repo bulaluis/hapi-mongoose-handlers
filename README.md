@@ -18,13 +18,13 @@ server.connection({ port: 8000 });
 server.register([{
         register: require('hapi-mongoose-connect'),
         options: {
-            uri: 'mongodb://localhost/my-database'
+            mongooseUri: 'mongodb://localhost/my-database'
         }
     }, {
         register: require('hapi-mongoose-models'),
         options: {
-            pattern: './models/**/*.js',
-            options: {
+            globPattern: './models/**/*.js',
+            globOptions: {
                 cwd: __dirname
             }
         }
@@ -39,7 +39,7 @@ server.register([{
         register: require('hapi-mongoose-handlers'),
         options: {
             find: function (route, options) {},     // Custom handler
-            meta: {                               // Can personalize the meta information
+            meta: {                                 // Can personalize the meta information
                 totalPagesKey: 'count'
             },
             onCreate: 'object',                     // Determine what information will return
@@ -54,7 +54,7 @@ server.register([{
 
         server.route({
             method: 'GET',
-            path: '/api/{model}/{id?}'       // hapi-mongoose-request Plugin is necessary
+            path: '/api/{model}/{id?}'              // hapi-mongoose-request Plugin is necessary
             handler: {
                 find: {}
             }
