@@ -57,6 +57,7 @@ var routes = [{
 var adminId;
 var userId;
 
+
 lab.before(function (done) {
 
     Mongoose.connect('mongodb://localhost/test-hapi-mongoose-handlers', function (err) {
@@ -221,6 +222,37 @@ lab.experiment('Hapi-mongoose-handlers', function () {
             });
         });
 
+        lab.test('inject request `/admins` with query params `where: { _id: randomId }`, it returns `ok` message', function (done) {
+
+            var query = {
+                where: { _id: adminId }
+            };
+            var request = {
+                method: 'GET',
+                url: '/v1/admins?' + Qs.stringify(query)
+            };
+            server.inject(request, function (response) {
+
+                Code.expect(response.statusCode).to.be.equal(200);
+                Code.expect(response.result).to.be.equal('ok');
+                return done();
+            });
+        });
+
+        lab.test('inject request `/admins/{adminId}`, it returns `ok` message', function (done) {
+
+            var request = {
+                method: 'GET',
+                url: '/v1/admins' + Mongoose.Types.ObjectId(),
+            };
+            server.inject(request, function (response) {
+
+                Code.expect(response.statusCode).to.be.equal(200);
+                Code.expect(response.result).to.be.equal('ok');
+                return done();
+            });
+        });
+
         lab.test('inject request `POST /users` it returns statusCode 200 and one record', function (done) {
 
             var request = {
@@ -337,6 +369,39 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                     Code.expect(response.result.meta.totalDocs).to.equal(20);
                     Code.expect(response.result.meta.totalPages).to.equal(1);
 
+                    return done();
+                });
+            });
+
+            lab.test('with query params `where: { _id: adminId }`, it returns admin record', function (done) {
+
+                var query = {
+                    where: { _id: adminId }
+                };
+                var request = {
+                    method: 'GET',
+                    url: '/v1/admins?' + Qs.stringify(query)
+                };
+                server.inject(request, function (response) {
+
+                    Code.expect(response.statusCode).to.be.equal(200);
+                    Code.expect(response.result.Admin.id).to.be.equal(adminId);
+                    return done();
+                });
+            });
+
+            lab.test('with query params `where: { _id: randomId }`, it returns statusCode 404', function (done) {
+
+                var query = {
+                    where: { _id: String(Mongoose.Types.ObjectId()) }
+                };
+                var request = {
+                    method: 'GET',
+                    url: '/v1/admins?' + Qs.stringify(query)
+                };
+                server.inject(request, function (response) {
+
+                    Code.expect(response.statusCode).to.be.equal(404);
                     return done();
                 });
             });
@@ -485,7 +550,7 @@ lab.experiment('Hapi-mongoose-handlers', function () {
 
         lab.experiment('inject request', function () {
 
-            lab.test('`/admins/{id}`, it returns one record with id equal to {id}', function (done) {
+            lab.test('`/admins/{adminId}`, it returns one record with id equal to {id}', function (done) {
 
                 var request = {
                     method: 'GET',
@@ -502,11 +567,11 @@ lab.experiment('Hapi-mongoose-handlers', function () {
             });
 
 
-            lab.test('`/admins/{id}34` (bad id), it returns Boom object with statusCode 500', function (done) {
+            lab.test('`/admins/{badId}`, it returns Boom object with statusCode 500', function (done) {
 
                 var request = {
                     method: 'GET',
-                    url: '/v1/admins/' + adminId + '34'
+                    url: '/v1/admins/' + adminId + 33
                 };
                 server.inject(request, function (response) {
 
@@ -568,11 +633,11 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                 });
             });
 
-            lab.test('`/users/{adminId}` (not user id), it returns Boom object with statusCode 404', function (done) {
+            lab.test('`/users/{randomId}`, it returns Boom object with statusCode 404', function (done) {
 
                 var request = {
                     method: 'GET',
-                    url: '/v1/users/' + adminId
+                    url: '/v1/users/' + Mongoose.Types.ObjectId()
                 };
                 server.inject(request, function (response) {
 
@@ -609,11 +674,11 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                 });
             });
 
-            lab.test('`DELETE /users/{userId}33` (bad id), it returns Boom object with statusCode 500', function (done) {
+            lab.test('`DELETE /users/{badId}`, it returns Boom object with statusCode 500', function (done) {
 
                 var request = {
                     method: 'DELETE',
-                    url: '/v1/users/' + userId + 33
+                    url: '/v1/users/' + adminId + 33
                 };
                 server.inject(request, function (response) {
 
@@ -623,11 +688,11 @@ lab.experiment('Hapi-mongoose-handlers', function () {
                 });
             });
 
-            lab.test('`DELETE /admins/{userId}` (not admin id), it returns Boom object with statusCode 404', function (done) {
+            lab.test('`DELETE /admins/{randomId}`, it returns Boom object with statusCode 404', function (done) {
 
                 var request = {
                     method: 'DELETE',
-                    url: '/v1/admins/' + userId
+                    url: '/v1/admins/' + Mongoose.Types.ObjectId()
                 };
                 server.inject(request, function (response) {
 
@@ -794,7 +859,7 @@ lab.experiment('Hapi-mongoose-handlers', function () {
             });
         });
 
-        lab.test('inject request `PUT /admins/{adminId}33` (bad id), it returns statusCode 500', function (done) {
+        lab.test('inject request `PUT /admins/{badId}`, it returns statusCode 500', function (done) {
 
             var request = {
                 method: 'PUT',
@@ -807,11 +872,11 @@ lab.experiment('Hapi-mongoose-handlers', function () {
             });
         });
 
-        lab.test('inject request `PUT /admins/{userId}` (not admin id), it returns statusCode 404', function (done) {
+        lab.test('inject request `PUT /admins/{randomId}`, it returns statusCode 404', function (done) {
 
             var request = {
                 method: 'PUT',
-                url: '/v1/admins/' + userId
+                url: '/v1/admins/' + Mongoose.Types.ObjectId()
             };
             server.inject(request, function (response) {
 
